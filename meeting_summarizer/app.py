@@ -20,9 +20,9 @@ summarizer_prompter = SummarizerPrompter(language="zh-tw")
 # Load data from file
 text = webvtt_loader.load_data(file_path)
 
-max_tokens = 2000
+max_tokens = 1000
 overlap_size = 100
-text_engine = "text-davinci-003"
+text_engine = "text-curie-001"
 
 # Set the OpenAI API key
 import os 
@@ -37,12 +37,15 @@ for i, chunk in enumerate(chunks):
         model = text_engine,
         prompt = chunk_prompt,
         temperature = 0.5,
-        max_tokens = 500,
+        max_tokens = 200,
         top_p = 1,
         frequency_penalty = 0,
-        presence_penalty = 0,
+        presence_penalty = 2,
+        stop= "\n"
     )
     chunk_text = response["choices"][0]["text"].strip()
+    if chunk_text =="" or chunk_text == "\n":
+        continue
     print(chunk_text)
     chunk_responses.append(chunk_text)
 

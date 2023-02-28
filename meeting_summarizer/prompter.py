@@ -9,7 +9,7 @@ class SummarizerPrompter:
         if self.language == "en":
             chunk_prompt = f"Summarize the transcript:\n\n{chunk}"
         elif self.language == "zh-tw":
-            chunk_prompt = f"總結這段文字，去除空格與加上標點符號:\n\n{chunk}"
+            chunk_prompt = f"請用中文總結，並加上標點符號:\n {chunk}"
         return chunk_prompt
     def get_consolidated_prompt(self, chunk_responses):
         if self.language == "en":
