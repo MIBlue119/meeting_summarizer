@@ -1,13 +1,12 @@
 """Defines the summarizer class."""
-
-from meeting_summarizer.config import AppConfig
 from meeting_summarizer.utils import breakup_text_into_chunks,get_model_selection,generate_openai_completion,parse_text_response
 
 class Summarizer:
-    config= AppConfig()
-    def __init__(self, prompter, loader):
+    def __init__(self, config, prompter_class, loader):
+        """Initializes the summarizer class."""
+        self.config = config
         self.text_engine = self.config.TEXT_ENGINE
-        self.prompter = prompter(language=self.config.LANGUAGE)
+        self.prompter = prompter_class(language=self.config.LANGUAGE)
         self.loader = loader
         self.loaded_text = None
         self.chunks = None
