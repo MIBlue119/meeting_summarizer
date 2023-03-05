@@ -1,5 +1,7 @@
 import tiktoken
 import openai
+from ratelimiter import RateLimiter
+from retrying import retry
 
 def text2token(text: str, encoding: str = "gpt2"):
     """Tokenize a text into a list of tokens.
@@ -74,6 +76,21 @@ def get_engine_method(text_engine):
     }
     return method_selected[text_engine]
 
+@retry(stop_max_attempt_number=10)
+@RateLimiter(max_calls=20, period=60)
+def generate_openai_completion(text_engine, api_settings):
+    """Generate the completion using OpenAI API.
+    
+    Append the model selection and engine method according to the text engine.
+    Add rate limiter and retry decorator to avoid the rate limit error.
+
+    Ref: https://community.openai.com/t/continuous-gpt3-api-500-error-the-server-had-an-error-while-processing-your-request-sorry-about-that/42239/30?page=2
+    Package: 
+        https://github.com/RazerM/ratelimiter
+        https://github.com/rholder/retrying
+    """
+    response=get_engine_method(text_engine)(**api_settings)
+    return response
 
 if __name__ == "__main__":
     # Test the function
