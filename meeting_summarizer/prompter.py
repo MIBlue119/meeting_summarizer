@@ -1,5 +1,4 @@
 """Defines the prompter class for the summarizer."""
-
 class SummarizerPrompter:
     def __init__(self, language):
         self.language = language

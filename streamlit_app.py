@@ -51,6 +51,7 @@ if make_button:
     if os.path.exists(st.session_state["summarized_file_name"]) == False:
        
         streamlit_progress_bar = st.progress(0)
+        streamlit_progress_message = st.markdown(" ")
         summarizing=st.markdown("Summarizing...")
         message = st.markdown(" ")
 
@@ -75,10 +76,11 @@ if make_button:
             config.IS_TEST = False
         # Initialize the Summarizer class
         openai.api_key = openai_key
-        summarizer = Summarizer(config,SummarizerPrompter, data_loader, streamlit_progress_bar=streamlit_progress_bar)
+        summarizer = Summarizer(config,SummarizerPrompter, data_loader, streamlit_progress_bar=streamlit_progress_bar, streamlit_progress_message=streamlit_progress_message)
         summarizer.make_summary(file_path=st.session_state["original_transcrpt_name"], export_dir=path)
         streamlit_progress_bar.progress(100)
-        summarizing.markdown("Done")
+        streamlit_progress_message = st.markdown(" ")
+        summarizing.markdown("Processing Done.")
         
     with open(st.session_state["summarized_file_name"],"rb") as f:
         st.session_state["summary"]=f.read()

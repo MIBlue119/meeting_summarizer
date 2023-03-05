@@ -14,5 +14,6 @@ class AppConfig:
     LANGUAGE = "zh-tw"
     IS_TEST = True
     TEST_NUM = 2
+    FINAL_SUMMARY_TOKENS = 2000
     def set_text_engine(self, text_engine):
         self.TEXT_ENGINE = text_engine_choices[text_engine]

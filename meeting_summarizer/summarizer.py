@@ -1,10 +1,10 @@
 """Defines the summarizer class."""
 from pathlib import Path
 from tqdm import tqdm
-from meeting_summarizer.utils import breakup_text_into_chunks,get_model_selection,generate_openai_completion,parse_text_response
+from meeting_summarizer.utils import breakup_text_into_chunks,get_model_selection,generate_openai_completion,parse_text_response, count_tokens
 
 class Summarizer:
-    def __init__(self, config, prompter_class, loader,streamlit_progress_bar=None):
+    def __init__(self, config, prompter_class, loader,streamlit_progress_bar=None, streamlit_progress_message=None):
         """Initializes the summarizer class."""
         self.config = config
         self.text_engine = self.config.TEXT_ENGINE
@@ -15,6 +15,7 @@ class Summarizer:
         self.chunk_responses = []
         self.meeting_summary = None
         self.streamlit_progress_bar = streamlit_progress_bar
+        self.streamlit_progress_message = streamlit_progress_message
     
     def load_data(self, file_path):
         """Loads data from file."""
@@ -28,7 +29,9 @@ class Summarizer:
         progress_bar_max = self.config.TEST_NUM if self.config.IS_TEST else len(self.chunks)
         progress_bar = tqdm(total=progress_bar_max)
 
-        index = 0 
+        index = 0
+        if self.streamlit_progress_message is not None:
+            self.streamlit_progress_message.markdown("Summarizing per chunks...") 
         for i, chunk in enumerate(self.chunks):
             progress_bar.update(index)
             chunk_prompt = self.prompter.get_chunk_prompt(chunk, text_engine=self.text_engine)
@@ -55,27 +58,54 @@ class Summarizer:
             self.chunk_responses.append(chunk_text)
             if self.config.IS_TEST and i == self.config.TEST_NUM:
                 break
+        
+        num_tokens = count_tokens(' '.join(self.chunk_responses))
+        if (num_tokens+self.config.FINAL_SUMMARY_TOKENS) > 3800:
+            # If the total number of tokens is greater than 3800, then we need to reduce the number of tokens in the final summary.
+            # We would like to summarize again with a smaller number of tokens.
+            # Replace the loaded text with the chunk responses and then summarize again
+            self.loaded_text = ' '.join(self.chunk_responses)
+            # Clean the chunk responses
+            self.chunk_responses = []
+            self.breakup_text_into_chunks(max_tokens=1000, overlap_size=200)
+            self.summarize_chunks()
+        else:
+            return
     def summarize_all(self):
-        """Summarizes all chunks responses to get final summary anf keytakeaways."""
+        """Summarizes all chunks responses to get final summary and keytakeaways."""
+        if self.streamlit_progress_message is not None:
+            self.streamlit_progress_message.markdown("Summarizes all chunks responses to get final summary and keytakeaways.")
         consolidated_prompt = self.prompter.get_consolidated_prompt(self.chunk_responses, text_engine=self.text_engine)
+        if self.streamlit_progress_bar is not None:
+            self.streamlit_progress_bar.progress(0)
         api_settings = {
             **get_model_selection(self.text_engine),
             **consolidated_prompt,
             "n": 1,
-            "max_tokens" : 2000,
+            "max_tokens" : self.config.FINAL_SUMMARY_TOKENS,
             "temperature": self.config.TEXT_ENGINE_TEMPERATURE,
             "presence_penalty" : 0
         }
         response =  generate_openai_completion(text_engine=self.text_engine, api_settings=api_settings)
         self.meeting_summary = parse_text_response(response, text_engine=self.text_engine)
+        if self.streamlit_progress_bar is not None:
+            self.streamlit_progress_bar.progress(100)        
         return self.meeting_summary
 
     def write_summary_to_file(self,file_path):
         """Writes the summary to a file."""
+        if self.streamlit_progress_message is not None:
+            self.streamlit_progress_message.markdown("Writing summary to file...")
+        if self.streamlit_progress_bar is not None:
+            self.streamlit_progress_bar.progress(0)            
         with open(file_path, "w") as f:
             f.write(self.meeting_summary)
+        if self.streamlit_progress_bar is not None:
+            self.streamlit_progress_bar.progress(100) 
+        if self.streamlit_progress_message is not None:
+            self.streamlit_progress_message.markdown("Finished writing summary to file.")                       
     def make_summary(self, file_path, export_dir: str = None):
-        """Makes the summary.""" 
+        """Makes the summary."""     
         # Extract file name
         file_name = Path(file_path).stem
         # Load data from file    
