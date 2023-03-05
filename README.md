@@ -15,6 +15,9 @@
   - https://github.com/openai/openai-cookbook/blob/main/examples/book_translation/translate_latex_book.ipynb
   - https://github.com/openai/openai-cookbook/blob/main/examples/fine-tuned_qa/olympics-1-collect-data.ipynb
   - oepnai web crawl qa: https://github.com/openai/openai-cookbook/blob/main/apps/web-crawl-q-and-a/web-qa.ipynb
+  - [splitting-chunking-large-input-text-for-summarisation-greater-than-4096-tokens](https://community.openai.com/t/splitting-chunking-large-input-text-for-summarisation-greater-than-4096-tokens/18494/14)
+    - recursive summary: https://github.dev/daveshap/RecursiveSummarizer
+    - other tools: https://github.com/miso-belica/sumy
 - Others
   - https://help.openai.com/en/articles/5072263-how-do-i-use-stop-sequences
 

@@ -20,8 +20,8 @@ summarizer_prompter = SummarizerPrompter(language="zh-tw")
 # Load data from file
 text = webvtt_loader.load_data(file_path)
 
-max_tokens = 1000
-overlap_size = 100
+max_tokens = 1500
+overlap_size = 500
 text_engine = "text-curie-001"
 
 # Set the OpenAI API key
@@ -37,7 +37,7 @@ for i, chunk in enumerate(chunks):
         model = text_engine,
         prompt = chunk_prompt,
         temperature = 0.5,
-        max_tokens = 200,
+        max_tokens = 100,
         top_p = 1,
         frequency_penalty = 0,
         presence_penalty = 2,
@@ -52,15 +52,15 @@ for i, chunk in enumerate(chunks):
 # Consolidate the response by calling the api again
 consolidated_prompt = summarizer_prompter.get_consolidated_prompt(chunk_responses)
 response =  openai.Completion.create(
-    model = text_engine,
+    model = "text-davinci-003",#text_engine,
     prompt = consolidated_prompt,
     temperature = 0.5,
-    max_tokens = 1000,
+    max_tokens = 2000,
     top_p = 1,
     frequency_penalty = 0,
     presence_penalty = 0,
 )
 
 meeting_summary = response["choices"][0]["text"].strip()
-print(meeting_summary)
+print("\n\n"+meeting_summary)
 
