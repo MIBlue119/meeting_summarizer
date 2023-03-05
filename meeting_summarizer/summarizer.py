@@ -1,4 +1,5 @@
 """Defines the summarizer class."""
+from tqdm import tqdm
 from meeting_summarizer.utils import breakup_text_into_chunks,get_model_selection,generate_openai_completion,parse_text_response
 
 class Summarizer:
@@ -21,7 +22,12 @@ class Summarizer:
         self.chunks = breakup_text_into_chunks(self.loaded_text, max_tokens, overlap_size)
     def summarize_chunks(self):
         """Summarizes the text."""
+        progress_bar_max = self.config.TEST_NUM if self.config.IS_TEST else len(self.chunks)
+        progress_bar = tqdm(total=progress_bar_max)
+
+        index = 0 
         for i, chunk in enumerate(self.chunks):
+            progress_bar.update(index)
             chunk_prompt = self.prompter.get_chunk_prompt(chunk, text_engine=self.text_engine)
             api_settings ={
                 **get_model_selection(self.text_engine),
@@ -37,6 +43,7 @@ class Summarizer:
             if chunk_text =="" or chunk_text == "\n":
                 continue
             print([chunk_text])
+            index += 1
             self.chunk_responses.append(chunk_text)
             if self.config.IS_TEST and i == self.config.TEST_NUM:
                 break

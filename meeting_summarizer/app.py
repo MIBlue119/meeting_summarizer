@@ -1,11 +1,14 @@
-import os 
+import os
+import argparse
+
 import openai
+from tqdm import tqdm
+
 from meeting_summarizer.fileloader.webvtt_loader import WebVttLoader
 from meeting_summarizer.prompter import SummarizerPrompter
 from meeting_summarizer.config import AppConfig
 from meeting_summarizer.summarizer import Summarizer
 from meeting_summarizer.utils import LANGUAGES, TO_LANGUAGE_CODE
-import argparse
 
 def main(args):
     # Set the OpenAI API key
