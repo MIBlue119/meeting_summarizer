@@ -58,7 +58,7 @@ if __name__ == "__main__":
         "--test",
         dest="test",
         action="store_true",
-        help="If test we only summarize 6 contents you can easily check",
+        help="If test we only summarize 4 contents you can easily check",
     )
     parser.add_argument(
         "--test_num",

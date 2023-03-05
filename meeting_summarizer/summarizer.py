@@ -48,7 +48,10 @@ class Summarizer:
             print([chunk_text])
             index += 1
             if self.streamlit_progress_bar is not None:
-                self.streamlit_progress_bar.progress(index/progress_bar_max)
+                if index/progress_bar_max > 1:
+                    self.streamlit_progress_bar.progress(1)
+                else:
+                    self.streamlit_progress_bar.progress(index/progress_bar_max)
             self.chunk_responses.append(chunk_text)
             if self.config.IS_TEST and i == self.config.TEST_NUM:
                 break
@@ -71,7 +74,7 @@ class Summarizer:
         """Writes the summary to a file."""
         with open(file_path, "w") as f:
             f.write(self.meeting_summary)
-    def make_summary(self, file_path):
+    def make_summary(self, file_path, export_dir: str = None):
         """Makes the summary.""" 
         # Extract file name
         file_name = Path(file_path).stem
@@ -84,5 +87,10 @@ class Summarizer:
         # Summarize all chunks responses to get final summary and keytakeaways
         meeting_summary = self.summarize_all()
         # Write the summary to a file
-        self.write_summary_to_file(f"{file_name}.summary.txt")
-        print(meeting_summary)
+        if export_dir is None:
+            export_dir = Path(file_path).parent
+        else:
+            export_dir = Path(export_dir)
+        export_file_path = Path(export_dir) / f"{file_name}.summary.txt"
+        self.write_summary_to_file(export_file_path)
+        print("\n Results:\n"+meeting_summary)
