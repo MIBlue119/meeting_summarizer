@@ -18,7 +18,7 @@ class SummarizerPrompter:
             }
         return chunk_prompt
     def get_consolidated_prompt(self, chunk_responses, text_engine="text-davinci-003"):
-        consolidated_prompt = f"#lang:{self.language}#Input\n|{chunk_responses}|\n#lang:{self.language}\n#Instructions\n Consoloidate these summaries under 150 words.And list 5key takeaways."
+        consolidated_prompt = f"#lang:{self.language}#Instructions\n Consoloidate these summaries under 150 words.And list 5key takeaways.#Input\n|{chunk_responses}|\n#lang:{self.language}\n"
         if "text"in text_engine:
             return {
                 "prompt": consolidated_prompt,
