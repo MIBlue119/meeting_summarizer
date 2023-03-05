@@ -13,11 +13,8 @@ from meeting_summarizer.utils import LANGUAGES, TO_LANGUAGE_CODE
 
 def main(args):
     # Set the OpenAI API key
-    openai.api_key = os.getenv("OPENAI_API_KEY")    
-
+    openai.api_key = os.getenv("OPENAI_API_KEY")         
     file_path = args.file_path
-    # Extract the file name
-    file_name = Path(file_path).stem
     # Check the file is .vtt or .srt file
     file_extension = Path(file_path).suffix
     if file_extension not in [".vtt", ".srt"]:
@@ -38,17 +35,7 @@ def main(args):
         config.IS_TEST = False
     # Initialize the Summarizer class
     summarizer = Summarizer(config,SummarizerPrompter, data_loader)
-    # Load data from file    
-    summarizer.load_data(file_path)
-    # Break up the text into chunks
-    summarizer.breakup_text_into_chunks(max_tokens=config.MAX_TOKENS, overlap_size=config.OVERLAP_SIZE)
-    # Summarize the chunks
-    summarizer.summarize_chunks()
-    # Summarize all chunks responses to get final summary and keytakeaways
-    meeting_summary = summarizer.summarize_all()
-    # Write the summary to a file
-    summarizer.write_summary_to_file(f"{file_name}.summary.txt")
-    print(meeting_summary)
+    summarizer.make_summary(file_path)        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

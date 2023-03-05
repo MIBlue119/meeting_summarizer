@@ -1,4 +1,5 @@
 """Defines the summarizer class."""
+from pathlib import Path
 from tqdm import tqdm
 from meeting_summarizer.utils import breakup_text_into_chunks,get_model_selection,generate_openai_completion,parse_text_response
 
@@ -67,3 +68,18 @@ class Summarizer:
         """Writes the summary to a file."""
         with open(file_path, "w") as f:
             f.write(self.meeting_summary)
+    def make_summary(self, file_path):
+        """Makes the summary.""" 
+        # Extract file name
+        file_name = Path(file_path).stem
+        # Load data from file    
+        self.load_data(file_path)
+        # Break up the text into chunks
+        self.breakup_text_into_chunks(max_tokens=self.config.MAX_TOKENS, overlap_size=self.config.OVERLAP_SIZE)
+        # Summarize the chunks
+        self.summarize_chunks()
+        # Summarize all chunks responses to get final summary and keytakeaways
+        meeting_summary = self.summarize_all()
+        # Write the summary to a file
+        self.write_summary_to_file(f"{file_name}.summary.txt")
+        print(meeting_summary)
