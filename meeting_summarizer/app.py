@@ -1,10 +1,11 @@
 import os
 import argparse
+from pathlib import Path
 
 import openai
 from tqdm import tqdm
 
-from meeting_summarizer.fileloader.webvtt_loader import WebVttLoader
+from meeting_summarizer.fileloader import WebVttLoader, SrtLoader
 from meeting_summarizer.prompter import SummarizerPrompter
 from meeting_summarizer.config import AppConfig
 from meeting_summarizer.summarizer import Summarizer
@@ -13,6 +14,17 @@ from meeting_summarizer.utils import LANGUAGES, TO_LANGUAGE_CODE
 def main(args):
     # Set the OpenAI API key
     openai.api_key = os.getenv("OPENAI_API_KEY")    
+
+    file_path = args.file_path
+    # Check the file is .vtt or .srt file
+    file_extension = Path(file_path).suffix
+    if file_extension not in [".vtt", ".srt"]:
+        raise ValueError("File must be a .vtt /.srt file")
+    # Initialize the loader class
+    if file_extension == ".vtt":
+        data_loader = WebVttLoader()
+    elif file_extension == ".srt":
+        data_loader = SrtLoader()
     # Initialize the WebVTTLoader class
     webvtt_loader = WebVttLoader()
     # Initialize the config class
@@ -25,12 +37,8 @@ def main(args):
     else:
         config.IS_TEST = False
     # Initialize the Summarizer class
-    summarizer = Summarizer(config,SummarizerPrompter, webvtt_loader)
-    # Load data from file
-    file_path = args.file_path
-    # Check the file is .vtt file
-    if not file_path.endswith(".vtt"):
-        raise ValueError("File must be a .vtt file")
+    summarizer = Summarizer(config,SummarizerPrompter, data_loader)
+    # Load data from file    
     summarizer.load_data(file_path)
     # Break up the text into chunks
     summarizer.breakup_text_into_chunks(max_tokens=config.MAX_TOKENS, overlap_size=config.OVERLAP_SIZE)
