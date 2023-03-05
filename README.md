@@ -7,7 +7,7 @@
 - Arguments
 
   - Necessary
-    - `--file_path`: Set the transcript file path. Current only support `.vtt` 
+    - `--file_path`: Set the transcript file path. Current only support `.vtt` format
   - Options
     - `--text_engine`: Set the open ai text engine. Default text engine is `gpt-3.5-turbo`
     - `--language`: Set the target summarized language. Default language is `zh-hant`
