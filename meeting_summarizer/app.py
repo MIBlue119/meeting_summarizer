@@ -13,6 +13,11 @@ def main(args):
     webvtt_loader = WebVttLoader()
     # Initialize the config class
     config = AppConfig()
+    if args.test:
+        config.IS_TEST = True
+        config.TEST_NUM = args.test_num
+    else:
+        config.IS_TEST = False
     # Initialize the Summarizer class
     summarizer = Summarizer(config,SummarizerPrompter, webvtt_loader)
     # Load data from file
@@ -32,5 +37,18 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--file_path", type=str, help="Path to the file to be summarized.")
+    parser.add_argument(
+        "--test",
+        dest="test",
+        action="store_true",
+        help="If test we only summarize 6 contents you can easily check",
+    )
+    parser.add_argument(
+        "--test_num",
+        dest="test_num",
+        type=int,
+        default=6,
+        help="test num for the test",
+    )    
     args = parser.parse_args()
     main(args)
