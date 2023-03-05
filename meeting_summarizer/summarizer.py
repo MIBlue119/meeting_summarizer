@@ -4,7 +4,7 @@ from tqdm import tqdm
 from meeting_summarizer.utils import breakup_text_into_chunks,get_model_selection,generate_openai_completion,parse_text_response
 
 class Summarizer:
-    def __init__(self, config, prompter_class, loader):
+    def __init__(self, config, prompter_class, loader,streamlit_progress_bar=None):
         """Initializes the summarizer class."""
         self.config = config
         self.text_engine = self.config.TEXT_ENGINE
@@ -14,6 +14,7 @@ class Summarizer:
         self.chunks = None
         self.chunk_responses = []
         self.meeting_summary = None
+        self.streamlit_progress_bar = streamlit_progress_bar
     
     def load_data(self, file_path):
         """Loads data from file."""
@@ -46,6 +47,8 @@ class Summarizer:
                 continue
             print([chunk_text])
             index += 1
+            if self.streamlit_progress_bar is not None:
+                self.streamlit_progress_bar.progress(index/progress_bar_max)
             self.chunk_responses.append(chunk_text)
             if self.config.IS_TEST and i == self.config.TEST_NUM:
                 break
