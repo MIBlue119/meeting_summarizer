@@ -1,5 +1,9 @@
 # Meeting_Summarizer
 
+## Usage
+
+- install dependencies `pip install -r requirements.txt`
+
 # Resources
 
 - https://blog.devgenius.io/creating-meeting-minutes-using-openai-gpt-3-api-f79e5fc15eb1
