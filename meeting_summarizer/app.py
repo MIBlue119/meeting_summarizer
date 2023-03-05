@@ -1,3 +1,4 @@
+import os 
 import openai
 from meeting_summarizer.fileloader.webvtt_loader import WebVttLoader
 from meeting_summarizer.prompter import SummarizerPrompter
@@ -8,10 +9,18 @@ from meeting_summarizer.utils import (
     breakup_text_into_chunks,
     parse_text_response,
     get_model_selection,
-    get_engine_method
+    get_engine_method,
+    generate_openai_completion
 )
-from meeting_summarizer.config import TEXT_ENGINE, TEXT_ENGINE_TEMPERATURE, LANGUAGE, IS_TEST, TEST_NUM
-
+from meeting_summarizer.config import (TEXT_ENGINE, 
+                                       TEXT_ENGINE_TEMPERATURE, 
+                                       LANGUAGE, 
+                                       IS_TEST, 
+                                       TEST_NUM,
+                                       MAX_TOKENS,
+                                       OVERLAP_SIZE)
+# Set the OpenAI API key
+openai.api_key = os.getenv("OPENAI_API_KEY")
 # Load data from file
 file_path = "/Users/weirenlan/Desktop/self_practice/meeting_summarizer/examples/EP108_humanosis_Podcast.vtt"
 
@@ -24,17 +33,9 @@ summarizer_prompter = SummarizerPrompter(language=LANGUAGE)
 # Load data from file
 text = webvtt_loader.load_data(file_path)
 
-max_tokens = 1500
-overlap_size = 500
-
-
-# Set the OpenAI API key
-import os 
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 # Iterate through the chunks of text to summarize
 chunk_responses = []
-chunks = breakup_text_into_chunks(text, max_tokens, overlap_size)
+chunks = breakup_text_into_chunks(text, MAX_TOKENS, OVERLAP_SIZE)
 for i, chunk in enumerate(chunks):
     chunk_prompt = summarizer_prompter.get_chunk_prompt(chunk, text_engine=TEXT_ENGINE)
     api_settings ={
@@ -47,13 +48,11 @@ for i, chunk in enumerate(chunks):
 
 
     }
-    print({**api_settings})
-    print(get_engine_method(TEXT_ENGINE))
-    response = get_engine_method(TEXT_ENGINE)(**api_settings)
+    response = generate_openai_completion(text_engine=TEXT_ENGINE, api_settings=api_settings)
     chunk_text =  parse_text_response(response, text_engine=TEXT_ENGINE)
     if chunk_text =="" or chunk_text == "\n":
         continue
-    print(chunk_text)
+    print([chunk_text])
     chunk_responses.append(chunk_text)
     if IS_TEST and i == TEST_NUM:
         break
@@ -69,7 +68,7 @@ api_settings = {
     "presence_penalty" : 0
 
 }
-response = get_engine_method(TEXT_ENGINE)(**api_settings)
+response =  generate_openai_completion(text_engine=TEXT_ENGINE, api_settings=api_settings)
 meeting_summary = parse_text_response(response, text_engine=TEXT_ENGINE)
 print("\n\n"+meeting_summary)
 
