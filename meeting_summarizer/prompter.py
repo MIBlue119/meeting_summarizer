@@ -6,7 +6,6 @@ class SummarizerPrompter:
 
     def get_chunk_prompt(self, chunk, text_engine="text-davinci-003"):
         chunk_prompt = f"#Input\n{chunk}\n#lang:{self.language}#Instuctions:TL;DR:"
-        print(chunk_prompt)
         if "text" in text_engine:
             return {
                 "prompt": chunk_prompt,
