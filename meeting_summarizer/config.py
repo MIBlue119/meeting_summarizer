@@ -8,7 +8,7 @@ text_engine_choices = {
 }
 
 MAX_TOKENS = 1500
-OVERLAP_SIZE = int(MAX_TOKENS/4)
+OVERLAP_SIZE = int(MAX_TOKENS/5)
 TEXT_ENGINE = text_engine_choices["gpt-3.5-turbo"]
 TEXT_ENGINE_TEMPERATURE = 0.5
 LANGUAGE = "zh-tw"

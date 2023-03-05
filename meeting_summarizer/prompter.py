@@ -9,9 +9,9 @@ class SummarizerPrompter:
 
     def get_chunk_prompt(self, chunk, text_engine="text-davinci-003"):
         if self.language == "en":
-            chunk_prompt = f"Summarize the transcript:\n\n{chunk}"
+            chunk_prompt = f"{chunk}\nTL;DR en:"
         elif self.language == "zh-tw":
-            chunk_prompt = f"請用中文總結，並加上標點符號:\n {chunk}"
+            chunk_prompt = f"{chunk}\nTL;DR zhtw:"
 
         if "text" in text_engine:
             return {
