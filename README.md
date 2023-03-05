@@ -1,6 +1,7 @@
 # Meeting_Summarizer
 
 - A tanscript summarizer package
+- streamlit demo app: https://miblue119-meeting-summarizer-streamlit-app-650rqa.streamlit.app/
 
 ## Usage
 
