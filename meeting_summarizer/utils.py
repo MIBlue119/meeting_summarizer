@@ -1,4 +1,5 @@
 import tiktoken
+import openai
 
 def text2token(text: str, encoding: str = "gpt2"):
     """Tokenize a text into a list of tokens.
@@ -46,7 +47,34 @@ def breakup_text_into_chunks(text: str, max_tokens: int=2000, overlap_size:int=1
             yield from breakup_tokens(tokens[max_tokens-overlap_size:], max_tokens, overlap_size)
     
     return list(breakup_tokens(tokens, max_tokens, overlap_size))
+
+def parse_text_response(openai_text_response, text_engine):
+    """According to the text engine, parse the response content.
     
+    Different text engine support different response structures
+    """
+    if "text" in text_engine:
+        return openai_text_response.choices[0].text.strip()
+    elif "gpt-3.5" in text_engine:
+        return openai_text_response['choices'][0]['message']['content']
+
+def get_model_selection(text_engine):
+    """Return the model selection according to the text engine."""
+    model_seletection = {
+        "gpt-3.5-turbo": {  "model": text_engine},
+        "text-davinci-003": {  "engine": text_engine},
+    }
+    return model_seletection[text_engine]
+
+def get_engine_method(text_engine):
+    """Return the engine method according to the text engine."""
+    method_selected = {
+        "gpt-3.5-turbo": openai.ChatCompletion.create,
+        "text-davinci-003": openai.Completion.create,
+    }
+    return method_selected[text_engine]
+
+
 if __name__ == "__main__":
     # Test the function
     text = "Hello, my name is John. I am a software engineer. I like to code."
