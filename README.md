@@ -3,6 +3,21 @@
 ## Usage
 
 - install dependencies `pip install -r requirements.txt`
+- Set your openai api key with `export OPENAI_API_KEYOPENAI="sxxxxxxxx"`
+- Arguments
+
+  - Necessary
+    - `--file_path`: Set the transcript file path. Current only support `.vtt` 
+  - Options
+    - `--text_engine`: Set the open ai text engine. Default text engine is `gpt-3.5-turbo`
+    - `--language`: Set the target summarized language. Default language is `zh-hant`
+    - `--test`: Whether to test part of content
+    - `--test_num`: How many number of contents do you want to summarize?
+- Example
+
+  ```
+  $python -m meeting_summarizer.app --file_path ./examples/EP108_humanosis_Podcast.vtt --test --language ja
+  ```
 
 # Resources
 
