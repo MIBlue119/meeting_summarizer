@@ -16,6 +16,8 @@ def main(args):
     openai.api_key = os.getenv("OPENAI_API_KEY")    
 
     file_path = args.file_path
+    # Extract the file name
+    file_name = Path(file_path).stem
     # Check the file is .vtt or .srt file
     file_extension = Path(file_path).suffix
     if file_extension not in [".vtt", ".srt"]:
@@ -25,8 +27,6 @@ def main(args):
         data_loader = WebVttLoader()
     elif file_extension == ".srt":
         data_loader = SrtLoader()
-    # Initialize the WebVTTLoader class
-    webvtt_loader = WebVttLoader()
     # Initialize the config class
     config = AppConfig()
     config.set_text_engine(args.text_engine)
@@ -46,6 +46,8 @@ def main(args):
     summarizer.summarize_chunks()
     # Summarize all chunks responses to get final summary and keytakeaways
     meeting_summary = summarizer.summarize_all()
+    # Write the summary to a file
+    summarizer.write_summary_to_file(f"{file_name}.summary.txt")
     print(meeting_summary)
 
 if __name__ == "__main__":

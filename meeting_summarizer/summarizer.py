@@ -12,6 +12,7 @@ class Summarizer:
         self.loaded_text = None
         self.chunks = None
         self.chunk_responses = []
+        self.meeting_summary = None
     
     def load_data(self, file_path):
         """Loads data from file."""
@@ -59,5 +60,10 @@ class Summarizer:
             "presence_penalty" : 0
         }
         response =  generate_openai_completion(text_engine=self.text_engine, api_settings=api_settings)
-        meeting_summary = parse_text_response(response, text_engine=self.text_engine)
-        return meeting_summary
+        self.meeting_summary = parse_text_response(response, text_engine=self.text_engine)
+        return self.meeting_summary
+
+    def write_summary_to_file(self,file_path):
+        """Writes the summary to a file."""
+        with open(file_path, "w") as f:
+            f.write(self.meeting_summary)
